@@ -34,8 +34,8 @@ def scanXhicoS8():
 
 def stopRun():
     if debug: print("Stop")
-    #os.system("pkill -f snowden.py")
-    #os.system("rm -rf __pycache__/ *.h264")
+    os.system("pkill -f snowden.py")
+    os.system("rm -rf __pycache__/ *.h264")
 
     GPIO.output(ledPin, True)
     time.sleep(blinkTime)
@@ -58,9 +58,9 @@ def startRun():
     time.sleep(blinkTime)
     GPIO.output(ledPin, False)
     
-    #os.system("pkill -f snowden.py")
-    #os.system("rm -rf __pycache__/ *.h264")
-    #os.system("python3 snowden.py &")    
+    os.system("pkill -f 'snowden.py'")
+    os.system("rm -rf __pycache__/ *.h264")
+    os.system("python3 snowden.py &")    
     
     global isRunning
     isRunning = True
@@ -69,7 +69,7 @@ def startRun():
 
 
 if __name__ == '__main__':
-
+    
     ledPin = 18
     blinkTime = 0.5
     
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             time.sleep(5)
             
     except:
-        os.system("pkill -f snowden.py")
+        os.system("pkill -f 'python3 snowden.py'")
         os.system("rm -rf __pycache__/ *.h264")
         GPIO.cleanup()
 

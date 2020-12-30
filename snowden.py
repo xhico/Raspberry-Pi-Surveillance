@@ -88,6 +88,7 @@ def send_mail(fileVid):
 
 
 def main():
+   
     with picamera.PiCamera() as camera:
         camera.resolution = (REC_WIDTH, REC_HEIGHT)
         camera.framerate = REC_FRAMERATE
