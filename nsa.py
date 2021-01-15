@@ -3,12 +3,10 @@
 
 # sudo apt-get install python3 python3-pip python3-dev python3-rpi.gpio libatlas-base-dev gpac libxslt-dev -y && pip3 install yagmail picamera numpy
 
-
 import os
 import time
 import subprocess
 import RPi.GPIO as GPIO
-
 
 debug = False
 mac_addr =  ''
