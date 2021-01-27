@@ -40,14 +40,13 @@ class MotionDetector(picamera.array.PiMotionAnalysis):
         a = np.sqrt(
             np.square(a['x'].astype(np.float)) +
             np.square(a['y'].astype(np.float))
-            ).clip(0, 255).astype(np.uint8)
+        ).clip(0, 255).astype(np.uint8)
 
         vector_count = (a > MOTION_MAGNITUDE).sum()
 
         if vector_count > MOTION_VECTORS:
             self.detected = time.time()
             self.vector_count = vector_count
-
 
 
 def write_video(stream):
@@ -65,9 +64,9 @@ def write_video(stream):
     stream.truncate()
 
 
-
 def send_mail(fileVid):
-    if debug: print("Send Email")
+    if debug:
+        print("Send Email")
 
     yag = yagmail.SMTP(EMAIL_SENDER, EMAIL_PASSWORD)
 
@@ -83,12 +82,12 @@ def send_mail(fileVid):
 
     yag.close()
 
-    if debug: print("Email Sent")
-
+    if debug:
+        print("Email Sent")
 
 
 def main():
-   
+
     with picamera.PiCamera() as camera:
         camera.resolution = (REC_WIDTH, REC_HEIGHT)
         camera.framerate = REC_FRAMERATE
@@ -98,31 +97,37 @@ def main():
 
         motion_detector = MotionDetector(camera)
         stream = picamera.PiCameraCircularIO(camera, size=FILE_BUFFER)
-        camera.start_recording(stream, format='h264', bitrate=REC_BITRATE, intra_period=REC_FRAMERATE, motion_output=motion_detector)
+        camera.start_recording(stream, format='h264', bitrate=REC_BITRATE,
+                               intra_period=REC_FRAMERATE, motion_output=motion_detector)
 
         try:
             while True:
-                if debug: print('Waiting for motion')
+                if debug:
+                    print('Waiting for motion')
                 while motion_detector.detected < time.time() - 1:
                     camera.wait_recording(1)
 
                 motionTime = str(time.strftime('%Y-%m-%d_%H-%M-%S'))
-                if debug: print('Motion detected (' + str(motion_detector.vector_count) + ' vectors) ' + motionTime)
+                if debug:
+                    print(
+                        'Motion detected (' + str(motion_detector.vector_count) + ' vectors) ' + motionTime)
                 camera.split_recording('after.h264')
                 write_video(stream)
 
                 while motion_detector.detected > time.time() - REC_SECONDS:
                     camera.wait_recording(1)
 
-                if debug: print('Motion stopped!')
+                if debug:
+                    print('Motion stopped!')
                 camera.split_recording(stream)
 
                 videoPath = 'records/' + motionTime + '.mp4'
-                os.system('MP4Box -add before.h264 -cat after.h264 ' + videoPath + ' > /dev/null 2>&1')
+                os.system('MP4Box -add before.h264 -cat after.h264 ' +
+                          videoPath + ' > /dev/null 2>&1')
                 os.system("rm -rf *.h264 *.h264")
 
-                process = Thread(target=send_mail, args=[videoPath])
-                process.start()
+                # process = Thread(target=send_mail, args=[videoPath])
+                # process.start()
 
         finally:
             camera.stop_recording()
