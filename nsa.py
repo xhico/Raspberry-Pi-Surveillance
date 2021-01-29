@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python3
 
-# sudo apt-get install python3 python3-pip python3-dev python3-rpi.gpio libatlas-base-dev gpac libxslt-dev -y && pip3 install yagmail picamera numpy
+# sudo apt-get install python3 python3-pip python3-dev python3-rpi.gpio libatlas-base-dev gpac libxslt-dev -y
+# pip3 install yagmail picamera numpy
 
 import os
 import time
 import subprocess
 import RPi.GPIO as GPIO
+from dotenv import load_dotenv
+load_dotenv()
 
-debug = True
-mac_addr = ''
+debug = False
+mac_addr = os.environ.get('BLUETOOTH')
 
 
 def scanXhicoS8():
@@ -40,14 +43,6 @@ def stopRun():
     os.system("pkill -f snowden.py")
     os.system("rm -rf __pycache__/ *.h264")
 
-    GPIO.output(ledPin, True)
-    time.sleep(blinkTime)
-    GPIO.output(ledPin, False)
-    time.sleep(blinkTime)
-    GPIO.output(ledPin, True)
-    time.sleep(blinkTime)
-    GPIO.output(ledPin, False)
-
     global isRunning
     isRunning = False
     return
@@ -56,10 +51,6 @@ def stopRun():
 def startRun():
     if debug:
         print("Start")
-
-    GPIO.output(ledPin, True)
-    time.sleep(blinkTime)
-    GPIO.output(ledPin, False)
 
     os.system("pkill -f 'snowden.py'")
     os.system("rm -rf __pycache__/ *.h264")
@@ -71,15 +62,6 @@ def startRun():
 
 
 if __name__ == '__main__':
-
-    ledPin = 18
-    blinkTime = 0.5
-
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(ledPin, GPIO.OUT)
-    GPIO.output(ledPin, False)
-
     isRunning = False
 
     try:

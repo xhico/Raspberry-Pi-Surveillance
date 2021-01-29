@@ -12,6 +12,8 @@ import picamera.array
 import numpy as np
 from threading import Thread
 from nsa import debug
+from dotenv import load_dotenv
+load_dotenv()
 
 
 REC_WIDTH = 640              # video width
@@ -25,9 +27,9 @@ FILE_BUFFER = 548576         # the size of the file buffer (bytes)
 MOTION_MAGNITUDE = 65        # the magnitude of vectors required for motion
 MOTION_VECTORS = 5           # the number of vectors required to detect motion
 
-EMAIL_SENDER = ""            # email account that sends the email
-EMAIL_PASSWORD = ""          # password for the email sender account
-EMAIL_RECEIVER = ""          # email to send the video
+EMAIL_SENDER = os.environ.get('MAIL_USER')          # email account that sends the email
+EMAIL_PASSWORD = os.environ.get('MAIL_PASS')        # password for the email sender account
+EMAIL_RECEIVER = os.environ.get('MAIL_RECEIVER')    # email to send the video
 
 
 class MotionDetector(picamera.array.PiMotionAnalysis):
@@ -126,8 +128,8 @@ def main():
                           videoPath + ' > /dev/null 2>&1')
                 os.system("rm -rf *.h264 *.h264")
 
-                # process = Thread(target=send_mail, args=[videoPath])
-                # process.start()
+                process = Thread(target=send_mail, args=[videoPath])
+                process.start()
 
         finally:
             camera.stop_recording()
