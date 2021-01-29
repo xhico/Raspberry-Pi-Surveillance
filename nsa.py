@@ -7,7 +7,6 @@
 import os
 import time
 import subprocess
-import RPi.GPIO as GPIO
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -85,4 +84,3 @@ if __name__ == '__main__':
     except:
         os.system("pkill -f 'python3 snowden.py'")
         os.system("rm -rf __pycache__/ *.h264")
-        GPIO.cleanup()
