@@ -11,6 +11,7 @@ import picamera
 import picamera.array
 import numpy as np
 from threading import Thread
+import subprocess
 from nsa import debug
 from dotenv import load_dotenv
 load_dotenv()
@@ -89,6 +90,7 @@ def send_mail(fileVid):
 
 
 def main():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     with picamera.PiCamera() as camera:
         camera.resolution = (REC_WIDTH, REC_HEIGHT)
@@ -111,8 +113,7 @@ def main():
 
                 motionTime = str(time.strftime('%Y-%m-%d_%H-%M-%S'))
                 if debug:
-                    print(
-                        'Motion detected (' + str(motion_detector.vector_count) + ' vectors) ' + motionTime)
+                    print('Motion detected (' + str(motion_detector.vector_count) + ' vectors) ' + motionTime)
                 camera.split_recording('after.h264')
                 write_video(stream)
 
@@ -124,8 +125,7 @@ def main():
                 camera.split_recording(stream)
 
                 videoPath = 'records/' + motionTime + '.mp4'
-                os.system('MP4Box -add before.h264 -cat after.h264 ' +
-                          videoPath + ' > /dev/null 2>&1')
+                os.system('MP4Box -add before.h264 -cat after.h264 ' + videoPath + ' > /dev/null 2>&1')
                 os.system("rm -rf *.h264 *.h264")
 
                 process = Thread(target=send_mail, args=[videoPath])

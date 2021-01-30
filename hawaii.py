@@ -2,6 +2,7 @@
 # !/usr/bin/python3
 
 from snowden import REC_WIDTH, REC_HEIGHT, REC_ROTATION, EMAIL_SENDER, EMAIL_PASSWORD, EMAIL_RECEIVER
+from nsa import debug
 from picamera import PiCamera
 import yagmail
 import time
@@ -26,21 +27,28 @@ def takePic(file):
 
 
 def main():
-    print("Kill NSA")
-    os.system("pkill -f 'python3 nsa.py'")
-    os.system("pkill -f 'python3 snowden.py'")
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    if debug:
+        print("Kill nsa")
+    os.system('kill $(ps ax | grep \'python3 /home/pi/nsa/nsa.py\' | grep -v grep | awk \'{print $1}\')')
+    os.system('kill $(ps ax | grep \'python3 /home/pi/nsa/snowden.py\' | grep -v grep | awk \'{print $1}\')')
 
     picFile = "pic_" + str(time.strftime('%Y-%m-%d_%H-%M-%S')) + ".jpg"
 
-    print("TakePic")
+    if debug:
+        print("TakePic")
     takePic(picFile)
-    print("SendMail")
+    if debug:
+        print("SendMail")
     send_mail(picFile)
-    print("RemovePic")
+    if debug:
+        print("RemovePic")
     os.remove(picFile)
 
-    print("Start NSA")
-    os.system("python3 nsa.py &")
+    if debug:
+        print("Start nsa")
+    os.system("python3 /home/pi/nsa/nsa.py &")
 
 
 if __name__ == '__main__':

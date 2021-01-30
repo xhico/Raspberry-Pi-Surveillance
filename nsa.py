@@ -6,19 +6,20 @@
 
 import os
 import time
+import signal
 import subprocess
 from dotenv import load_dotenv
 load_dotenv()
 
 debug = False
-mac_addr = os.environ.get('BLUETOOTH')
+MAC_ADDR = os.environ.get('BLUETOOTH')
 
 
-def scanXhicoS8():
+def scanXhico():
     if debug:
         print("Scanning for bluetooth")
 
-    process = subprocess.Popen(['sudo', 'l2ping', '-c', '1', mac_addr],
+    process = subprocess.Popen(['sudo', 'l2ping', '-c', '1', MAC_ADDR],
                                bufsize=1,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
@@ -39,8 +40,8 @@ def scanXhicoS8():
 def stopRun():
     if debug:
         print("Stop")
-    os.system("pkill -f snowden.py")
-    os.system("rm -rf __pycache__/ *.h264")
+
+    os.system('kill $(ps ax | grep \'python3 /home/pi/nsa/snowden.py\' | grep -v grep | awk \'{print $1}\')')
 
     global isRunning
     isRunning = False
@@ -50,10 +51,8 @@ def stopRun():
 def startRun():
     if debug:
         print("Start")
-
-    os.system("pkill -f 'snowden.py'")
-    os.system("rm -rf __pycache__/ *.h264")
-    os.system("python3 snowden.py &")
+    
+    os.system("python3 /home/pi/nsa/snowden.py &")
 
     global isRunning
     isRunning = True
@@ -63,24 +62,19 @@ def startRun():
 if __name__ == '__main__':
     isRunning = False
 
-    try:
-        while True:
-            isHere = scanXhicoS8()
+    while True:
+        isHere = scanXhico()
 
-            if debug:
-                print("isHere - " + str(isHere))
-            if debug:
-                print("isRunning - " + str(isRunning))
+        if debug:
+            print("isHere - " + str(isHere))
+        if debug:
+            print("isRunning - " + str(isRunning))
 
-            if isHere and isRunning:
-                stopRun()
-            elif not isHere and not isRunning:
-                startRun()
+        if isHere and isRunning:
+            stopRun()
+        elif not isHere and not isRunning:
+            startRun()
 
-            if debug:
-                print("")
-            time.sleep(5)
-
-    except:
-        os.system("pkill -f 'python3 snowden.py'")
-        os.system("rm -rf __pycache__/ *.h264")
+        if debug:
+            print("")
+        time.sleep(5)
